@@ -1,0 +1,195 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: 0;
+    padding: 0;
+    background: #001100;
+    color: #00FF44;
+    font-family: 'VT323', monospace;
+    overflow-x: hidden;
+  }
+}
+
+@layer components {
+  /* 건담 HUD 스타일 화면 - 단순한 3색 팔레트 */
+  .gundam-console {
+    background: #001100;
+    border: 2px solid #00FF44;
+    border-radius: 8px;
+    padding: 20px;
+    position: relative;
+  }
+
+  /* 메인 텍스트 - 초록 */
+  .federation-nixie {
+    color: #00FF44;
+    font-family: 'Orbitron', monospace;
+    font-weight: bold;
+  }
+
+  /* 경고/시스템 텍스트 - 주황 */
+  .zeon-nixie {
+    color: #FF6600;
+    font-family: 'Orbitron', monospace;
+    font-weight: bold;
+  }
+
+  /* 모빌슈트 HUD 텍스트 - 초록 */
+  .ms-hud-text {
+    color: #00FF44;
+    font-family: 'VT323', monospace;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* 파일럿/모빌슈트 이름 강조 - 주황 */
+  .pilot-name {
+    color: #FF6600;
+    font-weight: bold;
+    font-family: 'Orbitron', monospace;
+  }
+
+  /* 작전명/미션 제목 - 초록 */
+  .mission-title {
+    color: #00FF44;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  /* 메인 버튼 - 초록 */
+  .federation-button {
+    background: #001100;
+    border: 2px solid #00FF44;
+    color: #00FF44;
+    padding: 12px 24px;
+    font-family: 'Orbitron', monospace;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .federation-button:hover {
+    background: #00FF44;
+    color: #001100;
+  }
+
+  /* 보조 버튼 - 주황 */
+  .anaheim-button {
+    background: #001100;
+    border: 2px solid #FF6600;
+    color: #FF6600;
+    padding: 12px 24px;
+    font-family: 'Orbitron', monospace;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .anaheim-button:hover {
+    background: #FF6600;
+    color: #001100;
+  }
+
+  /* 모빌슈트 입력 필드 - 초록 */
+  .ms-input {
+    background: #001100;
+    border: 2px solid #00FF44;
+    color: #00FF44;
+    padding: 12px 16px;
+    font-family: 'VT323', monospace;
+    font-size: 18px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+  }
+
+  .ms-input:focus {
+    outline: none;
+    border-color: #FF6600;
+    background: #002200;
+  }
+
+  .ms-input::placeholder {
+    color: #228B22;
+    text-transform: uppercase;
+  }
+
+  /* 모빌슈트 시스템 상태 */
+  .ms-status-led {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin: 0 5px;
+  }
+
+  .ms-status-led.all-green {
+    background: #00FF44;
+  }
+
+  .ms-status-led.caution {
+    background: #FF6600;
+  }
+
+  .ms-status-led.alert {
+    background: #FF6600;
+  }
+
+  /* 모빌슈트 제목 표시줄 - 단순한 3색 */
+  .ms-title-bar {
+    background: #00FF44;
+    color: #001100;
+    padding: 8px 16px;
+    font-family: 'Orbitron', monospace;
+    font-weight: bold;
+    text-align: center;
+    margin: -20px -20px 20px -20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  /* CRT 스캔라인 효과 - 단순화 */
+  .crt-scanlines {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .crt-scanlines::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      transparent 50%,
+      rgba(0, 255, 68, 0.02) 50%
+    );
+    background-size: 100% 2px;
+    pointer-events: none;
+    z-index: 1;
+  }
+}
+
+@layer utilities {
+  .border-glow-primary {
+    border-color: #00FF44;
+  }
+  
+  .border-glow-secondary {
+    border-color: #FF6600;
+  }
+}

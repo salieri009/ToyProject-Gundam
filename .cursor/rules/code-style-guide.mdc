@@ -1,0 +1,40 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+### 1. Requirements & Problem-Solving
+
+* **Clarify Requirements**: Fully understand requirements before coding. If ambiguous, ask questions instead of making assumptions.
+* **Hypothesis-Driven Problem Solving**: When facing an issue, form a hypothesis, analyze to confirm, and fix the root cause.
+* **Deadlock Protocol**:
+    1.  **Stop & Re-evaluate**: Immediately pause and reassess your current approach and assumptions.
+    2.  **Explore Alternatives**: Identify at least two alternative solutions and compare their pros and cons.
+    3.  **Consult User**: Discuss the alternatives with the user to decide on the best path forward.
+* **State Limitations**: Clearly communicate if a request cannot be fully completed or if uncertainties exist.
+
+### 2. Design & Architecture
+
+* **Simple & Clear Design**: Aim for high cohesion and low coupling. Prioritize proven, standard patterns and the simplest possible structure over complex solutions.
+* **Design First, Code Later**: Finalize the design before implementing significant changes.
+
+
+### 3. Code Quality
+
+* **Readability (Self-Documenting Code)**: Use clear, descriptive names for variables and functions to reveal their purpose.
+* **Minimalist Comments**: Add comments only to explain the "why" behind complex logic, not what the code does.
+* **Adhere to Core Principles**:
+    * **Consistency**: Strictly follow established coding style guides (e.g., PEP 8).
+    * **DRY**: Abstract repeated logic into reusable functions/classes.
+    * **KISS & YAGNI**: Always choose the simplest solution and do not implement unrequested features.
+* **Robust Error Handling**: Use specific exceptions and validate all external inputs to ensure stability.
+
+### 4. Refactoring & Maintenance
+
+* **Confirm Major Refactoring with User**: For substantial refactoring, present the pros and cons of different approaches to the user and get approval before proceeding.
+* **Incremental Improvement (The Boy Scout Rule)**: Always leave the code cleaner than you found it.
+
+### 5. Core Considerations
+
+* **Security First**: Prioritize secure coding practices, being mindful of common vulnerabilities (e.g., OWASP Top 10).
+* **Performance Awareness**: Write efficient code, but avoid premature optimization. Only optimize proven bottlenecks.
