@@ -1,0 +1,20 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docs with sensitive info
+docs/LOCAL_SETUP_GUIDE.md
+
+# Logs
+*.log

@@ -6,7 +6,7 @@ from ..models.user import User
 
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 
-async def verify_google_token(token):
+def verify_google_token(token):
     try:
         idinfo = id_token.verify_oauth2_token(token, requests.Request(), GOOGLE_CLIENT_ID)
         
@@ -21,7 +21,7 @@ async def verify_google_token(token):
     except ValueError:
         return None
 
-async def get_or_create_user(user_info):
+def get_or_create_user(user_info):
     db = next(get_db())
     user = db.query(User).filter(User.google_id == user_info['google_id']).first()
     

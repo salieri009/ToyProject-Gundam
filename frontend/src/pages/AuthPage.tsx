@@ -1,13 +1,43 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { Shield, Terminal, Users } from 'lucide-react';
 import { StatusIndicator } from '../components/ui/StatusIndicator';
+import { authAPI } from '../services/api';
 
 export function AuthPage() {
-  const handleGoogleLogin = () => {
-    // Handle Google OAuth login
-    console.log('Google login initiated');
+  const navigate = useNavigate();
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const idToken = credentialResponse.credential;
+      const data = await authAPI.googleLogin(idToken);
+      
+      // Save tokens to localStorage
+      localStorage.setItem('auth_token', data.access_token);
+      localStorage.setItem('refresh_token', data.refresh_token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      
+      // Redirect to posts page
+      navigate('/posts');
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError(err.response?.data?.error || 'Login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleGoogleError = () => {
+    setError('Google login failed. Please try again.');
+  };
+
+  const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '';
 
   return (
     <div className="min-h-screen bg-ms-console-bg text-phosphor-green">
@@ -29,13 +59,31 @@ export function AuthPage() {
                   <Shield className="w-24 h-24 text-primary" />
                 </div>
                 
-                <button
-                  onClick={handleGoogleLogin}
-                  className="anaheim-button text-xl px-12 py-6 mx-auto block"
-                >
-                  <Terminal className="w-6 h-6 inline mr-3" />
-                  GOOGLE LOGIN
-                </button>
+                {error && (
+                  <div className="bg-red-900/50 border border-red-500 rounded p-4 text-red-200">
+                    {error}
+                  </div>
+                )}
+                
+                <div className="flex justify-center">
+                  <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+                    <GoogleLogin
+                      onSuccess={handleGoogleSuccess}
+                      onError={handleGoogleError}
+                      useOneTap
+                      theme="filled_black"
+                      size="large"
+                      text="signin_with"
+                      shape="rectangular"
+                    />
+                  </GoogleOAuthProvider>
+                </div>
+                
+                {loading && (
+                  <div className="ms-hud-text text-center">
+                    AUTHENTICATING PILOT...
+                  </div>
+                )}
                 
                 <div className="ms-hud-text">
                   SECURE AUTHENTICATION PROTOCOL

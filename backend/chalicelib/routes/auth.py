@@ -9,18 +9,18 @@ import hashlib
 auth_bp = Blueprint(__name__)
 
 @auth_bp.route('/auth/google', methods=['POST'])
-async def google_login():
+def google_login():
     request = auth_bp.current_request
     token = request.json_body.get('id_token')
     
     if not token:
         return {'error': 'Token is required'}, 400
         
-    user_info = await verify_google_token(token)
+    user_info = verify_google_token(token)
     if not user_info:
         return {'error': 'Invalid Google token'}, 401
         
-    user = await get_or_create_user(user_info)
+    user = get_or_create_user(user_info)
     access_token = create_access_token(user.id)
     refresh_token = create_refresh_token(user.id)
     

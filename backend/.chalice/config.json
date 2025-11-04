@@ -1,0 +1,40 @@
+{
+  "version": "2.0",
+  "app_name": "gundam-universe-board",
+  "stages": {
+    "dev": {
+      "api_gateway_stage": "api",
+      "autogen_policy": true,
+      "environment_variables": {
+        "STAGE": "dev",
+        "DATABASE_URL": "",
+        "JWT_SECRET": "",
+        "GOOGLE_CLIENT_ID": "",
+        "GOOGLE_CLIENT_SECRET": ""
+      },
+      "lambda_timeout": 30,
+      "lambda_memory_size": 512,
+      "tags": {
+        "project": "gundam-universe-board",
+        "environment": "development"
+      }
+    },
+    "prod": {
+      "api_gateway_stage": "api",
+      "autogen_policy": true,
+      "environment_variables": {
+        "STAGE": "prod",
+        "DATABASE_URL": "",
+        "JWT_SECRET": "",
+        "GOOGLE_CLIENT_ID": "",
+        "GOOGLE_CLIENT_SECRET": ""
+      },
+      "lambda_timeout": 30,
+      "lambda_memory_size": 1024,
+      "tags": {
+        "project": "gundam-universe-board",
+        "environment": "production"
+      }
+    }
+  }
+}
