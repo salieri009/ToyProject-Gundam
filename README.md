@@ -11,9 +11,19 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-316192?logo=postgresql)](https://www.postgresql.org)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
+**한국어** | [English](README.en.md) | [日本語](README.ja.md)
+
 ---
 
-## � About
+<div align="center">
+
+![Header](https://capsule-render.vercel.app/api?type=wave&color=gradient&customColorList=0,2,5,30&height=200&text=GUNDAM%20UNIVERSE%20BOARD&fontSize=60&fontColor=ffffff&animation=fadeIn&desc=Next-Generation%20Community%20Platform&descSize=20&descAlignY=70)
+
+</div>
+
+---
+
+## 📖 About
 
 **GUNDAM UNIVERSE BOARD**는 건담 우주세기 팬들을 위한 커뮤니티 플랫폼입니다.  
 현대적인 웹 기술 스택을 활용하여 **사용자 인증**, **게시판 CRUD**, **계층형 댓글 시스템**을 구현했습니다.
@@ -28,7 +38,209 @@
 
 ---
 
+## 📁 프로젝트 구조 (30년차 엔지니어 관점)
+
+이 섹션은 30년간의 소프트웨어 엔지니어링 경험을 바탕으로 작성되었습니다. 프로젝트의 아키텍처 설계 원칙과 각 레이어의 책임 분리를 명확히 설명합니다.
+
+### 전체 디렉토리 구조
+
+```
+ToyProject-Gundam/
+├── backend/                          # AWS Chalice 백엔드 서비스
+│   ├── app.py                        # Chalice 애플리케이션 엔트리포인트
+│   ├── requirements.txt              # Python 의존성 관리
+│   └── chalicelib/                   # 핵심 비즈니스 로직 라이브러리
+│       ├── config.py                 # 환경 변수 및 설정 관리
+│       ├── database.py                # SQLAlchemy 세션 관리 및 연결 풀
+│       ├── auth/                     # 인증 관련 모듈
+│       │   ├── google_auth.py        # Google OAuth 2.0 검증 로직
+│       │   └── jwt.py                # JWT 토큰 생성/검증 유틸리티
+│       ├── models/                   # SQLAlchemy ORM 모델 (도메인 엔티티)
+│       │   ├── user.py               # 사용자 엔티티 (users 테이블)
+│       │   ├── post.py               # 게시글 엔티티 (posts 테이블)
+│       │   ├── comment.py            # 댓글 엔티티 (comments 테이블)
+│       │   └── refresh_token.py      # 리프레시 토큰 엔티티
+│       └── routes/                   # REST API 엔드포인트 정의
+│           ├── __init__.py           # 라우트 등록 및 Blueprint 통합
+│           ├── auth.py               # 인증 API (/auth/*)
+│           ├── posts.py              # 게시글 API (/posts/*)
+│           └── comments.py           # 댓글 API (/comments/*)
+│
+├── frontend/                         # Next.js 프론트엔드 애플리케이션
+│   ├── package.json                  # Node.js 의존성 및 스크립트
+│   ├── next.config.js                # Next.js 빌드 설정
+│   ├── tailwind.config.js            # Tailwind CSS 유틸리티 설정
+│   ├── tsconfig.json                 # TypeScript 컴파일러 설정
+│   └── src/
+│       ├── app/                      # Next.js 14 App Router (파일 기반 라우팅)
+│       │   ├── layout.tsx            # 루트 레이아웃 (전역 스타일, 메타데이터)
+│       │   ├── page.tsx              # 홈페이지 (/)
+│       │   ├── globals.css           # 전역 CSS 스타일 (CRT 테마)
+│       │   ├── auth/
+│       │   │   └── page.tsx          # 인증 페이지 (/auth)
+│       │   └── posts/
+│       │       ├── page.tsx          # 게시글 목록 (/posts)
+│       │       ├── new/
+│       │       │   └── page.tsx      # 게시글 작성 (/posts/new)
+│       │       └── [id]/
+│       │           ├── page.tsx      # 게시글 상세 (/posts/:id)
+│       │           └── edit/
+│       │               └── page.tsx  # 게시글 수정 (/posts/:id/edit)
+│       │
+│       ├── components/               # 재사용 가능한 React 컴포넌트
+│       │   ├── layout/               # 레이아웃 컴포넌트
+│       │   │   ├── Header.tsx        # 네비게이션 헤더
+│       │   │   └── Footer.tsx        # 푸터
+│       │   └── ui/                   # UI 프리미티브 컴포넌트
+│       │       ├── LoadingSpinner.tsx    # 로딩 인디케이터
+│       │       ├── NixieNumber.tsx       # Nixie Tube 스타일 숫자 표시
+│       │       └── StatusIndicator.tsx   # 상태 표시기
+│       │
+│       ├── services/                 # 외부 API 통신 레이어
+│       │   ├── api.ts                # Axios 인스턴스 및 인터셉터 설정
+│       │   └── weatherService.ts     # (참고용) 날씨 API 서비스
+│       │
+│       ├── hooks/                    # 커스텀 React Hooks
+│       │   └── useAuth.ts            # 인증 상태 관리 훅
+│       │
+│       ├── context/                  # React Context API (전역 상태)
+│       │   └── WeatherContext.tsx     # (참고용) 날씨 컨텍스트
+│       │
+│       ├── types/                    # TypeScript 타입 정의
+│       │   ├── index.ts              # 공통 타입 (User, Post, Comment)
+│       │   └── weather.ts            # 날씨 관련 타입
+│       │
+│       └── pages/                    # (레거시) Pages Router 컴포넌트
+│           ├── AuthPage.tsx
+│           ├── HomePage.tsx
+│           ├── PostsPage.tsx
+│           ├── PostDetailPage.tsx
+│           └── NewPostPage.tsx
+│
+└── docs/                             # 프로젝트 문서화
+    ├── DesignPlan.md                 # 프로젝트 기획 및 설계 문서
+    ├── LOCAL_SETUP_GUIDE.md          # 로컬 개발 환경 설정 가이드
+    ├── LOCAL_SETUP_GUIDE.en.md       # 로컬 개발 환경 설정 가이드 (영어)
+    ├── LOCAL_SETUP_GUIDE.ja.md       # 로컬 개발 환경 설정 가이드 (일본어)
+    ├── 01_API_Design.md              # REST API 명세서
+    ├── 02_Database_Design.md         # 데이터베이스 스키마 설계
+    ├── 03_Frontend_Architecture.md   # 프론트엔드 아키텍처 문서
+    ├── 04_Backend_Architecture.md    # 백엔드 아키텍처 문서
+    └── 05_UI_UX_Design.md            # UI/UX 디자인 가이드
+```
+
+### 아키텍처 설계 원칙
+
+#### 1. **관심사의 분리 (Separation of Concerns)**
+- **Backend**: 비즈니스 로직, 데이터 검증, 데이터베이스 접근만 담당
+- **Frontend**: 사용자 인터페이스, 상태 관리, API 호출만 담당
+- **Database**: 데이터 영속성 및 관계 관리
+
+#### 2. **레이어드 아키텍처 (Layered Architecture)**
+```
+┌─────────────────────────────────────┐
+│   Presentation Layer (Next.js)     │  ← 사용자 인터페이스
+├─────────────────────────────────────┤
+│   Application Layer (Chalice)      │  ← 비즈니스 로직
+├─────────────────────────────────────┤
+│   Data Access Layer (SQLAlchemy)   │  ← 데이터베이스 추상화
+├─────────────────────────────────────┤
+│   Database Layer (PostgreSQL)      │  ← 데이터 영속성
+└─────────────────────────────────────┘
+```
+
+#### 3. **의존성 역전 원칙 (Dependency Inversion Principle)**
+- `routes/` 모듈은 `models/`와 `auth/`에 의존하지만, 구체적인 구현이 아닌 인터페이스에 의존
+- SQLAlchemy ORM을 통해 데이터베이스 구현 세부사항을 추상화
+
+#### 4. **단일 책임 원칙 (Single Responsibility Principle)**
+- 각 모듈은 하나의 명확한 책임만 가짐
+  - `auth/google_auth.py`: Google OAuth 검증만 담당
+  - `auth/jwt.py`: JWT 토큰 생성/검증만 담당
+  - `routes/posts.py`: 게시글 관련 API만 담당
+
+### 핵심 모듈 상세 설명
+
+#### Backend: `chalicelib/`
+
+**`database.py`** - 데이터베이스 연결 관리
+- SQLAlchemy `SessionLocal` 팩토리 패턴
+- 연결 풀링을 통한 성능 최적화
+- 컨텍스트 매니저를 통한 세션 생명주기 관리
+
+**`models/`** - 도메인 모델 (Entity Layer)
+- SQLAlchemy 2.0 스타일 ORM 모델
+- 관계형 매핑 (User ↔ Post ↔ Comment)
+- 타임스탬프 자동 관리 (`created_at`, `updated_at`)
+
+**`routes/`** - API 엔드포인트 (Controller Layer)
+- Chalice Blueprint를 통한 모듈화된 라우팅
+- 요청 검증 및 응답 직렬화
+- 인증 미들웨어 통합
+
+**`auth/`** - 인증 및 인가 (Security Layer)
+- Google OAuth 2.0 ID 토큰 검증
+- JWT 액세스 토큰 및 리프레시 토큰 관리
+- 토큰 만료 및 갱신 로직
+
+#### Frontend: `src/`
+
+**`app/`** - Next.js App Router (라우팅 레이어)
+- 파일 시스템 기반 라우팅
+- 서버 컴포넌트 및 클라이언트 컴포넌트 분리
+- 레이아웃 중첩을 통한 UI 재사용
+
+**`services/api.ts`** - HTTP 클라이언트 (통신 레이어)
+- Axios 인스턴스 싱글톤 패턴
+- 요청 인터셉터: JWT 토큰 자동 주입
+- 응답 인터셉터: 401 에러 시 자동 로그아웃
+
+**`components/`** - UI 컴포넌트 (프레젠테이션 레이어)
+- 원자적 설계 원칙 (Atomic Design) 준수
+- 재사용 가능한 UI 프리미티브
+- 레트로 80s CRT 테마 스타일링
+
+**`hooks/useAuth.ts`** - 인증 상태 관리 (상태 레이어)
+- React Context API를 통한 전역 인증 상태
+- 로컬 스토리지와의 동기화
+- 토큰 갱신 로직
+
+### 데이터 흐름 (Data Flow)
+
+```
+1. 사용자 액션 (Frontend)
+   ↓
+2. API 호출 (services/api.ts)
+   ↓
+3. HTTP 요청 (Axios Interceptor → JWT 자동 주입)
+   ↓
+4. API Gateway (AWS Lambda)
+   ↓
+5. Chalice 라우트 핸들러 (routes/*.py)
+   ↓
+6. 인증 미들웨어 (auth/jwt.py)
+   ↓
+7. 비즈니스 로직 처리
+   ↓
+8. 데이터베이스 쿼리 (SQLAlchemy ORM)
+   ↓
+9. PostgreSQL 실행
+   ↓
+10. 응답 반환 (역순)
+```
+
+### 확장성 고려사항
+
+- **수평 확장**: AWS Lambda는 자동으로 트래픽에 따라 스케일링
+- **데이터베이스 연결 풀**: SQLAlchemy QueuePool로 동시 연결 관리
+- **캐싱 전략**: 향후 Redis 도입 가능한 구조
+- **마이크로서비스 분리**: 각 Blueprint를 독립적인 Lambda 함수로 분리 가능
+
+---
+
 ## 🏛️ 솔루션 아키텍처
+
+<div align="center">
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -56,6 +268,8 @@
                     │  • Refresh Tokens          │
                     └────────────────────────────┘
 ```
+
+</div>
 
 ### 인증 흐름
 
@@ -114,7 +328,7 @@
 
 ### 로컬 개발 환경 셋업
 
-**상세한 설정 가이드는 [`docs/LOCAL_SETUP_GUIDE.md`](docs/LOCAL_SETUP_GUIDE.md)를 참조하세요.**
+> **📖 상세한 설정 가이드**: [`docs/LOCAL_SETUP_GUIDE.md`](docs/LOCAL_SETUP_GUIDE.md) | [English](docs/LOCAL_SETUP_GUIDE.en.md) | [日本語](docs/LOCAL_SETUP_GUIDE.ja.md)
 
 #### 1️⃣ 저장소 클론
 
@@ -173,22 +387,28 @@ npm run dev
 
 ---
 
-## � 문서
+## 📚 문서
+
+<div align="center">
 
 | 문서 | 설명 |
 |------|------|
 | [`docs/LOCAL_SETUP_GUIDE.md`](docs/LOCAL_SETUP_GUIDE.md) | 로컬 개발 환경 완전 설정 가이드 (PostgreSQL, 환경변수, Google OAuth) |
+| [`docs/LOCAL_SETUP_GUIDE.en.md`](docs/LOCAL_SETUP_GUIDE.en.md) | Complete local development setup guide |
+| [`docs/LOCAL_SETUP_GUIDE.ja.md`](docs/LOCAL_SETUP_GUIDE.ja.md) | ローカル開発環境セットアップガイド |
 | [`docs/01_API_Design.md`](docs/01_API_Design.md) | REST API 엔드포인트 명세서 (요청/응답 스키마) |
 | [`docs/02_Database_Design.md`](docs/02_Database_Design.md) | PostgreSQL 스키마, SQLAlchemy 모델, 인덱스 전략 |
 | [`docs/03_Frontend_Architecture.md`](docs/03_Frontend_Architecture.md) | Next.js 폴더 구조, 컴포넌트 설계, 상태 관리 |
 | [`docs/04_Backend_Architecture.md`](docs/04_Backend_Architecture.md) | Chalice 구조, 라우팅, 인증 미들웨어 |
 | [`docs/05_UI_UX_Design.md`](docs/05_UI_UX_Design.md) | 레트로 80s CRT 테마, Nixie Tube 디자인, CSS 효과 |
 
+</div>
+
 ---
 
 ## ✨ 주요 기능
 
-### � 인증 & 인가
+### 🔐 인증 & 인가
 
 - ✅ **Google OAuth 2.0** 로그인/로그아웃
 - ✅ **JWT 토큰** (24시간 유효)
@@ -237,11 +457,11 @@ chalice deploy --stage prod
 chalice status --stage dev
 ```
 
-자세한 배포 가이드는 [`docs/LOCAL_SETUP_GUIDE.md`](docs/LOCAL_SETUP_GUIDE.md#-aws-배포-준비)를 참조하세요.
+자세한 배포 가이드는 [`docs/LOCAL_SETUP_GUIDE.md`](docs/LOCAL_SETUP_GUIDE.md#8-aws-배포-준비)를 참조하세요.
 
 ---
 
-## � References
+## 📖 References
 
 ### 아키텍처 & 패턴
 
@@ -262,6 +482,8 @@ chalice status --stage dev
 - 🔗 [Gundam Wiki](https://en.gundam.info/en/) - 건담 우주세기 배경지식
 
 ---
+
+<div align="center">
 
 ## 🤝 Contributing
 
@@ -298,20 +520,10 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ---
 
-<div align="center">
-
 **Made with ❤️ by Salieri | AI-Assisted Development with Cursor**
 
 *건담 우주세기를 배경으로 한 차세대 게시판 플랫폼*
 
+**2025년 호주 겨울 방학 프로젝트**
+
 </div>
-
-# 설치
-npm install
-
-# 실행
-npm run dev
-
-
-## 🙏 Special Thanks
-Blonix 

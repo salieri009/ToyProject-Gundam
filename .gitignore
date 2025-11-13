@@ -13,8 +13,7 @@
 .DS_Store
 Thumbs.db
 
-# Docs with sensitive info
-docs/LOCAL_SETUP_GUIDE.md
+# Docs with sensitive info (removed - now multi-language and commit-ready)
 
 # Logs
 *.log
