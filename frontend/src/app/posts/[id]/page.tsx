@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
+import { postsAPI, commentsAPI } from '@/services/api'
 
 interface Comment {
   id: string
@@ -47,9 +48,14 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
 
   const fetchPost = async () => {
     try {
-      const response = await fetch(`/api/posts/${params.id}`)
-      const data = await response.json()
-      setPost(data)
+      const [postData, commentsData] = await Promise.all([
+        postsAPI.getPost(params.id),
+        commentsAPI.getComments(params.id)
+      ])
+      setPost({
+        ...postData,
+        comments: commentsData.comments || []
+      })
     } catch (error) {
       console.error('Failed to fetch post:', error)
     }
@@ -60,22 +66,10 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
     if (!newComment.trim()) return
 
     try {
-      const response = await fetch(`/api/posts/${params.id}/comments`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          content: newComment,
-          parent_id: replyTo,
-        }),
-      })
-
-      if (response.ok) {
-        setNewComment('')
-        setReplyTo(null)
-        fetchPost()
-      }
+      await commentsAPI.createComment(params.id, newComment, replyTo || undefined)
+      setNewComment('')
+      setReplyTo(null)
+      fetchPost()
     } catch (error) {
       console.error('Failed to submit comment:', error)
     }
@@ -85,13 +79,8 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
     if (!confirm('정말로 이 게시글을 삭제하시겠습니까?')) return
 
     try {
-      const response = await fetch(`/api/posts/${params.id}`, {
-        method: 'DELETE',
-      })
-
-      if (response.ok) {
-        router.push('/posts')
-      }
+      await postsAPI.deletePost(params.id)
+      router.push('/posts')
     } catch (error) {
       console.error('Failed to delete post:', error)
     }

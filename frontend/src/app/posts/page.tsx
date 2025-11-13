@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
+import { postsAPI } from '@/services/api'
 
 interface Post {
   id: string
@@ -34,6 +35,8 @@ export default function PostsPage() {
     total: 0,
     total_pages: 0
   })
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!user) {
@@ -46,12 +49,16 @@ export default function PostsPage() {
 
   const fetchPosts = async () => {
     try {
-      const response = await fetch(`/api/posts?page=${pagination.page}&limit=${pagination.limit}`)
-      const data = await response.json()
+      setLoading(true)
+      setError(null)
+      const data = await postsAPI.getPosts(pagination.page, pagination.limit)
       setPosts(data.posts)
       setPagination(data.pagination)
-    } catch (error) {
-      console.error('Failed to fetch posts:', error)
+    } catch (err: any) {
+      console.error('Failed to fetch posts:', err)
+      setError(err.response?.data?.error || '게시글을 불러오는데 실패했습니다.')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -68,8 +75,15 @@ export default function PostsPage() {
           </button>
         </div>
 
-        <div className="space-y-4">
-          {posts.map((post) => (
+        {loading && <div className="text-center py-8">로딩 중...</div>}
+        {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error}</div>}
+
+        {!loading && !error && (
+          <div className="space-y-4">
+            {posts.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">게시글이 없습니다.</div>
+            ) : (
+              posts.map((post) => (
             <div
               key={post.id}
               className="border p-4 rounded-lg cursor-pointer hover:bg-gray-50"
@@ -82,10 +96,13 @@ export default function PostsPage() {
                 <span>{new Date(post.created_at).toLocaleDateString()}</span>
               </div>
             </div>
-          ))}
-        </div>
+              ))
+            )}
+          </div>
+        )}
 
-        <div className="flex justify-center mt-8 space-x-2">
+        {!loading && pagination.total_pages > 1 && (
+          <div className="flex justify-center mt-8 space-x-2">
           {Array.from({ length: pagination.total_pages }, (_, i) => i + 1).map((page) => (
             <button
               key={page}
@@ -97,7 +114,8 @@ export default function PostsPage() {
               {page}
             </button>
           ))}
-        </div>
+          </div>
+        )}
       </div>
     </main>
   )

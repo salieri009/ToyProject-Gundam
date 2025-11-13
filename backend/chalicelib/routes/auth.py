@@ -1,6 +1,7 @@
 from chalice import Blueprint
 from ..auth.google_auth import verify_google_token, get_or_create_user
 from ..auth.jwt import create_access_token, create_refresh_token, verify_token
+from ..auth.middleware import require_auth
 from ..database import get_db
 from ..models.refresh_token import RefreshToken
 from datetime import datetime, timedelta
@@ -74,13 +75,14 @@ def refresh_token():
 
 @auth_bp.route('/auth/me', methods=['GET'])
 def get_current_user():
-    user = auth_bp.current_request.context.get('user')
-    if not user:
-        return {'error': 'Not authenticated'}, 401
-        
-    return {
-        'id': str(user.id),
-        'email': user.email,
-        'name': user.name,
-        'created_at': user.created_at.isoformat()
-    } 
+    request = auth_bp.current_request
+    try:
+        user = require_auth(request)
+        return {
+            'id': str(user.id),
+            'email': user.email,
+            'name': user.name,
+            'created_at': user.created_at.isoformat()
+        }
+    except Exception as e:
+        return {'error': str(e)}, 401 

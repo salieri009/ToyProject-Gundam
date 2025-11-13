@@ -1,6 +1,7 @@
 from chalice import Blueprint
 from ..database import get_db
 from ..models.post import Post
+from ..auth.middleware import require_auth
 from sqlalchemy import desc, func
 from sqlalchemy.orm import joinedload
 
@@ -84,10 +85,10 @@ def get_post(post_id):
 @posts_bp.route('/posts', methods=['POST'])
 def create_post():
     request = posts_bp.current_request
-    user = request.context.get('user')
-    
-    if not user:
-        return {'error': 'Not authenticated'}, 401
+    try:
+        user = require_auth(request)
+    except Exception as e:
+        return {'error': str(e)}, 401
         
     data = request.json_body
     if not data.get('title') or not data.get('content'):
@@ -118,10 +119,10 @@ def create_post():
 @posts_bp.route('/posts/{post_id}', methods=['PUT'])
 def update_post(post_id):
     request = posts_bp.current_request
-    user = request.context.get('user')
-    
-    if not user:
-        return {'error': 'Not authenticated'}, 401
+    try:
+        user = require_auth(request)
+    except Exception as e:
+        return {'error': str(e)}, 401
         
     db = next(get_db())
     post = db.query(Post).filter(Post.id == post_id).first()
@@ -151,10 +152,10 @@ def update_post(post_id):
 @posts_bp.route('/posts/{post_id}', methods=['DELETE'])
 def delete_post(post_id):
     request = posts_bp.current_request
-    user = request.context.get('user')
-    
-    if not user:
-        return {'error': 'Not authenticated'}, 401
+    try:
+        user = require_auth(request)
+    except Exception as e:
+        return {'error': str(e)}, 401
         
     db = next(get_db())
     post = db.query(Post).filter(Post.id == post_id).first()

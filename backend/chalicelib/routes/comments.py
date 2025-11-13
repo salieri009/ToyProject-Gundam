@@ -1,6 +1,7 @@
 from chalice import Blueprint
 from ..database import get_db
 from ..models.comment import Comment
+from ..auth.middleware import require_auth
 from sqlalchemy import desc
 from sqlalchemy.orm import joinedload
 
@@ -58,10 +59,10 @@ def get_comments(post_id):
 @comments_bp.route('/posts/{post_id}/comments', methods=['POST'])
 def create_comment(post_id):
     request = comments_bp.current_request
-    user = request.context.get('user')
-    
-    if not user:
-        return {'error': 'Not authenticated'}, 401
+    try:
+        user = require_auth(request)
+    except Exception as e:
+        return {'error': str(e)}, 401
         
     data = request.json_body
     if not data.get('content'):
@@ -93,10 +94,10 @@ def create_comment(post_id):
 @comments_bp.route('/comments/{comment_id}', methods=['PUT'])
 def update_comment(comment_id):
     request = comments_bp.current_request
-    user = request.context.get('user')
-    
-    if not user:
-        return {'error': 'Not authenticated'}, 401
+    try:
+        user = require_auth(request)
+    except Exception as e:
+        return {'error': str(e)}, 401
         
     db = next(get_db())
     comment = db.query(Comment).filter(Comment.id == comment_id).first()
@@ -129,10 +130,10 @@ def update_comment(comment_id):
 @comments_bp.route('/comments/{comment_id}', methods=['DELETE'])
 def delete_comment(comment_id):
     request = comments_bp.current_request
-    user = request.context.get('user')
-    
-    if not user:
-        return {'error': 'Not authenticated'}, 401
+    try:
+        user = require_auth(request)
+    except Exception as e:
+        return {'error': str(e)}, 401
         
     db = next(get_db())
     comment = db.query(Comment).filter(Comment.id == comment_id).first()

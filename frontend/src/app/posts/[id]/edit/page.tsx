@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
+import { postsAPI } from '@/services/api'
 
 interface Post {
   id: string
@@ -31,8 +32,7 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
 
   const fetchPost = async () => {
     try {
-      const response = await fetch(`/api/posts/${params.id}`)
-      const data = await response.json()
+      const data = await postsAPI.getPost(params.id)
       setPost(data)
       setTitle(data.title)
       setContent(data.content)
@@ -46,20 +46,8 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
     if (!title.trim() || !content.trim()) return
 
     try {
-      const response = await fetch(`/api/posts/${params.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title,
-          content,
-        }),
-      })
-
-      if (response.ok) {
-        router.push(`/posts/${params.id}`)
-      }
+      await postsAPI.updatePost(params.id, title, content)
+      router.push(`/posts/${params.id}`)
     } catch (error) {
       console.error('Failed to update post:', error)
     }

@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { authAPI } from '../services/api'
 
 interface User {
   id: string
@@ -27,25 +28,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('/api/auth/me')
-      if (response.ok) {
-        const data = await response.json()
-        setUser(data)
+      const token = localStorage.getItem('auth_token')
+      if (!token) {
+        setLoading(false)
+        return
       }
+      const data = await authAPI.getCurrentUser()
+      setUser(data)
     } catch (error) {
       console.error('Failed to check auth:', error)
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('refresh_token')
+      localStorage.removeItem('user')
     } finally {
       setLoading(false)
     }
   }
 
   const login = (token: string) => {
-    localStorage.setItem('token', token)
+    localStorage.setItem('auth_token', token)
     checkAuth()
   }
 
   const logout = () => {
-    localStorage.removeItem('token')
+    localStorage.removeItem('auth_token')
+    localStorage.removeItem('refresh_token')
+    localStorage.removeItem('user')
     setUser(null)
   }
 

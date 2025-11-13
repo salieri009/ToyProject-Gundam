@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
+import { postsAPI } from '@/services/api'
 
 export default function NewPostPage() {
   const router = useRouter()
@@ -15,21 +16,8 @@ export default function NewPostPage() {
     if (!title.trim() || !content.trim()) return
 
     try {
-      const response = await fetch('/api/posts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title,
-          content,
-        }),
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        router.push(`/posts/${data.id}`)
-      }
+      const data = await postsAPI.createPost(title, content)
+      router.push(`/posts/${data.id}`)
     } catch (error) {
       console.error('Failed to create post:', error)
     }
