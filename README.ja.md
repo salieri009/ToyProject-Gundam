@@ -174,7 +174,7 @@ ToyProject-Gundam/
 │  • Tailwind CSS      │  • Request Validation        │
 │  • Axios HTTP Client │  • Lambda Functions          │
 │                      │                              │
-│  localhost:5173      │   API Gateway: api.*         │
+│  localhost:3000      │   API Gateway: api.*         │
 └──────────┬───────────┴──────────┬───────────────────┘
            │                      │
            └──────────────────────┤
@@ -195,7 +195,7 @@ ToyProject-Gundam/
 ### 認証フロー
 
 1. **ログイン**: ユーザー → Google OAuth → バックエンド (`/auth/google`)
-2. **トークン発行**: バックエンド → JWT (24h) + リフレッシュトークン (7d)
+2. **トークン発行**: バックエンド → JWT (24h) + リフレッシュトークン (30d)
 3. **APIリクエスト**: フロントエンド → Axiosインターセプター（Bearerトークン自動付与）
 4. **トークン更新**: 期限切れ時 → `/auth/refresh`呼び出し → 新しいJWT発行
 5. **ログアウト**: クライアントトークン削除 + リフレッシュトークン無効化
@@ -297,13 +297,13 @@ npm install
 # .env.localファイルを作成（参照: .env.local.example）
 # 追加: NEXT_PUBLIC_API_URL, NEXT_PUBLIC_GOOGLE_CLIENT_ID
 
-# 開発サーバーを開始（ポート5173）
+# 開発サーバーを開始（ポート3000）
 npm run dev
 ```
 
 #### 4️⃣ ブラウザでアクセス
 
-- **Frontend**: http://localhost:5173
+- **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8000
 
 ---
@@ -327,7 +327,7 @@ npm run dev
 
 - ✅ **Google OAuth 2.0** ログイン/ログアウト
 - ✅ **JWTトークン**（24時間有効）
-- ✅ **リフレッシュトークン**（7日間有効、自動更新）
+- ✅ **リフレッシュトークン**（30日間有効、自動更新）
 - ✅ **ロールベースアクセス制御**（所有者のみ編集/削除可能）
 
 ### 📝 投稿管理

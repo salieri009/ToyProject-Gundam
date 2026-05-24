@@ -23,6 +23,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // 1단계: 로컬스토리지에서 세션 복원 시도
+    const savedUser = localStorage.getItem('user')
+    const token = localStorage.getItem('auth_token')
+    
+    if (savedUser && token) {
+      try {
+        setUser(JSON.parse(savedUser))
+      } catch (e) {
+        console.error('Failed to parse saved user:', e)
+      }
+    }
+    
+    // 2단계: 백그라운드에서 API 서버로 토큰 유효성 및 최신 정보 검증
     checkAuth()
   }, [])
 
@@ -30,16 +43,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const token = localStorage.getItem('auth_token')
       if (!token) {
+        setUser(null)
         setLoading(false)
         return
       }
+      
       const data = await authAPI.getCurrentUser()
       setUser(data)
+      localStorage.setItem('user', JSON.stringify(data))
     } catch (error) {
       console.error('Failed to check auth:', error)
-      localStorage.removeItem('auth_token')
-      localStorage.removeItem('refresh_token')
-      localStorage.removeItem('user')
+      // 만약 네트워크 에러가 아닌 인증 에러(401) 등으로 실패하면 클리어
+      // api.ts 인터셉터가 401을 처리하므로 여기서는 상세 체크만 수행
     } finally {
       setLoading(false)
     }
@@ -70,4 +85,4 @@ export function useAuth() {
     throw new Error('useAuth must be used within an AuthProvider')
   }
   return context
-} 
+}

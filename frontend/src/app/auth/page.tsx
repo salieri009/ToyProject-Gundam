@@ -3,32 +3,46 @@
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
+import { GoogleLoginButton } from '@/components/auth/GoogleLoginButton'
+import { Header } from '@/components/layout/Header'
+import { Footer } from '@/components/layout/Footer'
 
 export default function AuthPage() {
   const router = useRouter()
-  const { user } = useAuth()
+  const { user, loading } = useAuth()
 
   useEffect(() => {
-    if (user) {
+    if (!loading && user) {
       router.push('/posts')
     }
-  }, [user, router])
+  }, [user, loading, router])
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] font-mono">
+        <p className="text-crt-text/80 animate-pulse text-sm">CHECKING USER CREDENTIALS...</p>
+      </div>
+    )
+  }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <h1 className="text-4xl font-bold mb-8">로그인</h1>
-        <div className="flex flex-col items-center space-y-4">
-          <button
-            onClick={() => {
-              // Google 로그인 처리
-            }}
-            className="bg-white text-black px-4 py-2 rounded-lg flex items-center space-x-2"
-          >
-            <span>Google로 로그인</span>
-          </button>
+    <div className="flex flex-col min-h-screen justify-between py-4">
+      <Header />
+      
+      <main className="flex flex-col items-center justify-center my-12">
+        <div className="w-full max-w-md p-2 bg-crt-glow/5 border border-crt-glow/20 rounded">
+          <div className="border border-crt-glow/30 p-8 rounded bg-black flex flex-col items-center">
+            <h1 className="text-3xl font-bold tracking-widest text-crt-text mb-2 font-mono">PILOT LOGIN</h1>
+            <p className="text-xs text-crt-text/50 font-mono mb-8 text-center">
+              ACCESS DEPLOYMENT ARCHIVES & COMMUNICATE WITH FELLOW OFFISERS
+            </p>
+            
+            <GoogleLoginButton />
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+
+      <Footer />
+    </div>
   )
-} 
+}

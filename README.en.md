@@ -251,7 +251,7 @@ ToyProject-Gundam/
 │  • Tailwind CSS      │  • Request Validation        │
 │  • Axios HTTP Client │  • Lambda Functions          │
 │                      │                              │
-│  localhost:5173      │   API Gateway: api.*         │
+│  localhost:3000      │   API Gateway: api.*         │
 └──────────┬───────────┴──────────┬───────────────────┘
            │                      │
            └──────────────────────┤
@@ -272,7 +272,7 @@ ToyProject-Gundam/
 ### Authentication Flow
 
 1. **Login**: User → Google OAuth → Backend (`/auth/google`)
-2. **Token Issuance**: Backend → JWT (24h) + Refresh Token (7d)
+2. **Token Issuance**: Backend → JWT (24h) + Refresh Token (30d)
 3. **API Requests**: Frontend → Axios Interceptor (Bearer Token auto-included)
 4. **Token Refresh**: Expiration → `/auth/refresh` call → New JWT issued
 5. **Logout**: Client token deletion + Refresh Token invalidation
@@ -374,13 +374,13 @@ npm install
 # Create .env.local file (reference: .env.local.example)
 # Add: NEXT_PUBLIC_API_URL, NEXT_PUBLIC_GOOGLE_CLIENT_ID
 
-# Start development server (port 5173)
+# Start development server (port 3000)
 npm run dev
 ```
 
 #### 4️⃣ Access in Browser
 
-- **Frontend**: http://localhost:5173
+- **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8000
 
 ---
@@ -404,7 +404,7 @@ npm run dev
 
 - ✅ **Google OAuth 2.0** login/logout
 - ✅ **JWT tokens** (24-hour validity)
-- ✅ **Refresh tokens** (7-day validity, auto-renewal)
+- ✅ **Refresh tokens** (30-day validity, auto-renewal)
 - ✅ **Role-based access control** (only owners can edit/delete)
 
 ### 📝 Post Management

@@ -57,7 +57,7 @@
 │  FRONTEND (Next.js)  │   BACKEND (AWS Chalice)      │
 │  • React + TS        │  • JWT + OAuth               │
 │  • Tailwind CSS      │  • REST API                  │
-│  localhost:5173      │   API Gateway: api.*         │
+│  localhost:3000      │   API Gateway: api.*         │
 └──────────┬───────────┴──────────┬───────────────────┘
            │  HTTPS/JSON-RPC       │
            │  (JWT Authorization)  │
@@ -102,7 +102,7 @@ npm install
 npm run dev
 ```
 
-**접속:** Frontend `http://localhost:5173` • Backend API `http://localhost:8000`
+**접속:** Frontend `http://localhost:3000` • Backend API `http://localhost:8000`
 
 > 상세한 설정 가이드: [`docs/LOCAL_SETUP_GUIDE.md`](docs/LOCAL_SETUP_GUIDE.md)
 
@@ -110,7 +110,7 @@ npm run dev
 
 ## 주요 기능
 
-- **인증 & 인가**: Google OAuth 2.0, JWT (24h) + Refresh Token (7d), RBAC
+- **인증 & 인가**: Google OAuth 2.0, JWT (24h) + Refresh Token (30d), RBAC
 - **게시판**: CRUD, 페이지네이션, 본인 게시물만 수정/삭제
 - **댓글**: 계층형 구조 (1단계 댓글 + 대댓글)
 

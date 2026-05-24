@@ -4,16 +4,8 @@
 
 :root {
   --foreground-rgb: 0, 255, 0;
-  --background-start-rgb: 26, 26, 26;
-  --background-end-rgb: 0, 0, 0;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+  --background-start-rgb: 10, 15, 10;
+  --background-end-rgb: 2, 4, 2;
 }
 
 body {
@@ -23,56 +15,80 @@ body {
     rgb(var(--background-start-rgb)),
     rgb(var(--background-end-rgb))
   );
+  overflow-x: hidden;
 }
 
+/* CRT Screen Effect Container */
 .crt-screen {
   position: relative;
   overflow: hidden;
   min-height: 100vh;
   background: radial-gradient(
     circle at center,
-    rgba(0, 255, 0, 0.1) 0%,
-    rgba(0, 255, 0, 0.05) 50%,
+    rgba(0, 255, 0, 0.08) 0%,
+    rgba(0, 255, 0, 0.03) 60%,
     transparent 100%
   );
 }
 
+/* Scan lines */
 .scan-line {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  height: 2px;
-  background: rgba(0, 255, 0, 0.1);
-  animation: scan 8s linear infinite;
+  height: 4px;
+  background: rgba(0, 255, 0, 0.04);
+  animation: scan 12s linear infinite;
   pointer-events: none;
+  z-index: 9999;
 }
 
+/* Flicker effect */
 .flicker {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   background: transparent;
-  animation: flicker 0.15s infinite;
+  animation: flicker 0.25s infinite;
   pointer-events: none;
+  z-index: 9998;
+  opacity: 0.85;
+}
+
+/* CRT monitor grill pattern overlay */
+.crt-screen::before {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  z-index: 9997;
+  background-size: 100% 3px, 6px 100%;
+  pointer-events: none;
+}
+
+/* Glow Text class */
+.glow-text {
+  text-shadow: 0 0 4px rgba(0, 255, 0, 0.6), 0 0 10px rgba(0, 255, 0, 0.4);
 }
 
 @keyframes scan {
   0% {
-    transform: translateY(-100%);
+    transform: translateY(-100vh);
   }
   100% {
-    transform: translateY(100%);
+    transform: translateY(100vh);
   }
 }
 
 @keyframes flicker {
   0%, 100% {
-    opacity: 1;
+    opacity: 0.99;
   }
   50% {
-    opacity: 0.95;
+    opacity: 0.96;
   }
-} 
+}

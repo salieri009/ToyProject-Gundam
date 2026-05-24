@@ -1,21 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
-import { postsAPI, commentsAPI } from '@/services/api'
-
-interface Comment {
-  id: string
-  content: string
-  author: {
-    id: string
-    name: string
-  }
-  created_at: string
-  updated_at: string | null
-  replies: Comment[]
-}
+import { postsAPI } from '@/services/api'
+import { Header } from '@/components/layout/Header'
+import { Footer } from '@/components/layout/Footer'
+import { CommentList } from '@/components/comments/CommentList'
+import { Calendar, User, ArrowLeft, Edit3, Trash2 } from 'lucide-react'
 
 interface Post {
   id: string
@@ -25,55 +17,40 @@ interface Post {
     id: string
     name: string
   }
-  comments: Comment[]
   created_at: string
   updated_at: string | null
 }
 
 export default function PostDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter()
-  const { user } = useAuth()
+  const { user, loading: authLoading } = useAuth()
   const [post, setPost] = useState<Post | null>(null)
-  const [newComment, setNewComment] = useState('')
-  const [replyTo, setReplyTo] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchPost = useCallback(async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      const postData = await postsAPI.getPost(params.id)
+      setPost(postData)
+    } catch (err: any) {
+      console.error('Failed to fetch post:', err)
+      setError(err.response?.data?.error || '게시글을 불러오는데 실패했습니다.')
+    } finally {
+      setLoading(false)
+    }
+  }, [params.id])
 
   useEffect(() => {
-    if (!user) {
-      router.push('/auth')
-      return
-    }
-
-    fetchPost()
-  }, [user, router, params.id])
-
-  const fetchPost = async () => {
-    try {
-      const [postData, commentsData] = await Promise.all([
-        postsAPI.getPost(params.id),
-        commentsAPI.getComments(params.id)
-      ])
-      setPost({
-        ...postData,
-        comments: commentsData.comments || []
-      })
-    } catch (error) {
-      console.error('Failed to fetch post:', error)
-    }
-  }
-
-  const handleCommentSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!newComment.trim()) return
-
-    try {
-      await commentsAPI.createComment(params.id, newComment, replyTo || undefined)
-      setNewComment('')
-      setReplyTo(null)
+    if (!authLoading) {
+      if (!user) {
+        router.push('/auth')
+        return
+      }
       fetchPost()
-    } catch (error) {
-      console.error('Failed to submit comment:', error)
     }
-  }
+  }, [user, authLoading, router, fetchPost])
 
   const handleDelete = async () => {
     if (!confirm('정말로 이 게시글을 삭제하시겠습니까?')) return
@@ -81,111 +58,113 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
     try {
       await postsAPI.deletePost(params.id)
       router.push('/posts')
-    } catch (error) {
-      console.error('Failed to delete post:', error)
+    } catch (err) {
+      console.error('Failed to delete post:', err)
+      alert('게시글 삭제에 실패했습니다.')
     }
   }
 
-  if (!post) return <div>Loading...</div>
+  if (authLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] font-mono">
+        <p className="text-crt-text/80 animate-pulse text-sm">DECRYPTING USER SECTOR...</p>
+      </div>
+    )
+  }
+
+  const isAuthor = user?.id === post?.author.id
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-24">
-      <div className="z-10 max-w-5xl w-full">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
-          <div className="flex justify-between items-center text-gray-500">
-            <span>{post.author.name}</span>
-            <span>{new Date(post.created_at).toLocaleDateString()}</span>
-          </div>
+    <div className="flex flex-col min-h-screen justify-between py-4">
+      <Header />
+
+      <main className="flex-1 space-y-6 font-mono text-sm">
+        {/* Navigation & Control HUD */}
+        <div className="border border-crt-glow/30 bg-black/40 p-4 rounded flex justify-between items-center">
+          <button
+            onClick={() => router.push('/posts')}
+            className="border border-crt-text/30 hover:border-crt-text px-3 py-1.5 rounded text-crt-text/75 hover:text-crt-text transition-all flex items-center space-x-1"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>RETURN TO ARCHIVE</span>
+          </button>
+
+          {post && isAuthor && (
+            <div className="flex space-x-3">
+              <button
+                onClick={() => router.push(`/posts/${params.id}/edit`)}
+                className="border border-yellow-500/50 hover:bg-yellow-500/10 px-3 py-1.5 rounded text-yellow-500 transition-all flex items-center space-x-1.5"
+              >
+                <Edit3 className="w-4 h-4" />
+                <span>EDIT LOG</span>
+              </button>
+              <button
+                onClick={handleDelete}
+                className="border border-red-500/50 hover:bg-red-500/10 px-3 py-1.5 rounded text-red-500 transition-all flex items-center space-x-1.5"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>DELETE LOG</span>
+              </button>
+            </div>
+          )}
         </div>
 
-        <div className="prose max-w-none mb-8">
-          <p>{post.content}</p>
-        </div>
-
-        {user?.id === post.author.id && (
-          <div className="flex justify-end space-x-4 mb-8">
-            <button
-              onClick={() => router.push(`/posts/${params.id}/edit`)}
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg"
-            >
-              수정
-            </button>
-            <button
-              onClick={handleDelete}
-              className="bg-red-500 text-white px-4 py-2 rounded-lg"
-            >
-              삭제
-            </button>
+        {error && (
+          <div className="border border-red-500 bg-red-950/40 text-red-500 p-4 rounded">
+            ERROR RESPONSE: {error}
           </div>
         )}
 
-        <div className="mt-8">
-          <h2 className="text-2xl font-bold mb-4">댓글</h2>
-          <form onSubmit={handleCommentSubmit} className="mb-8">
-            <textarea
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder={replyTo ? '답글을 입력하세요...' : '댓글을 입력하세요...'}
-              className="w-full p-4 border rounded-lg mb-2"
-              rows={3}
-            />
-            <div className="flex justify-between">
-              {replyTo && (
-                <button
-                  type="button"
-                  onClick={() => setReplyTo(null)}
-                  className="text-gray-500"
-                >
-                  답글 취소
-                </button>
-              )}
-              <button
-                type="submit"
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg"
-              >
-                {replyTo ? '답글 작성' : '댓글 작성'}
-              </button>
-            </div>
-          </form>
-
-          <div className="space-y-4">
-            {post.comments.map((comment) => (
-              <div key={comment.id} className="border p-4 rounded-lg">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="font-semibold">{comment.author.name}</span>
-                  <span className="text-gray-500 text-sm">
-                    {new Date(comment.created_at).toLocaleDateString()}
-                  </span>
-                </div>
-                <p className="mb-2">{comment.content}</p>
-                <button
-                  onClick={() => setReplyTo(comment.id)}
-                  className="text-blue-500 text-sm"
-                >
-                  답글
-                </button>
-
-                {comment.replies && comment.replies.length > 0 && (
-                  <div className="ml-8 mt-4 space-y-4">
-                    {comment.replies.map((reply) => (
-                      <div key={reply.id} className="border p-4 rounded-lg">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="font-semibold">{reply.author.name}</span>
-                          <span className="text-gray-500 text-sm">
-                            {new Date(reply.created_at).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <p>{reply.content}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+        {loading ? (
+          <div className="border border-crt-glow/20 bg-black/20 p-8 rounded text-center">
+            <span className="text-crt-text/80 animate-pulse">DOWNLOADING SIGNAL TRANSMISSION...</span>
           </div>
-        </div>
-      </div>
-    </main>
+        ) : (
+          post && (
+            <article className="border border-crt-glow/30 bg-black/20 p-6 rounded space-y-6">
+              {/* Post Header */}
+              <div className="border-b border-crt-glow/20 pb-4">
+                <span className="text-[10px] text-crt-text/50 uppercase tracking-widest block mb-1">
+                  SYS.LOG // LOG-ENTRY
+                </span>
+                <h2 className="text-2xl font-bold text-crt-text tracking-wide mb-3">
+                  {post.title}
+                </h2>
+                
+                <div className="flex flex-wrap gap-4 text-xs text-crt-text/70">
+                  <span className="flex items-center space-x-1">
+                    <User className="w-3.5 h-3.5 text-crt-text/40" />
+                    <span>PILOT LOGGED BY: {post.author.name}</span>
+                  </span>
+                  <span className="flex items-center space-x-1">
+                    <Calendar className="w-3.5 h-3.5 text-crt-text/40" />
+                    <span>DATETIME: {new Date(post.created_at).toLocaleString()}</span>
+                  </span>
+                  {post.updated_at && (
+                    <span className="text-yellow-500/70">
+                      (MODIFIED: {new Date(post.updated_at).toLocaleString()})
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Post Content */}
+              <div className="text-crt-text/90 leading-relaxed whitespace-pre-wrap text-sm font-mono tracking-wide py-2 min-h-[150px]">
+                {post.content}
+              </div>
+            </article>
+          )
+        )}
+
+        {/* Comments Section */}
+        {post && (
+          <div className="mt-8">
+            <CommentList postId={params.id} />
+          </div>
+        )}
+      </main>
+
+      <Footer />
+    </div>
   )
-} 
+}
