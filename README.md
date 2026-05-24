@@ -122,6 +122,33 @@ chalice deploy --stage prod
 
 운영 배포 전에는 환경 변수, 로깅, 모니터링, 백업 정책을 분리해서 설정하세요.
 
+## Docker
+
+로컬에서 전체 스택을 실행하려면 루트에서 다음 명령을 사용하세요.
+
+```powershell
+docker compose up --build
+```
+
+실행 후 접속 주소는 다음과 같습니다.
+
+- Frontend: `http://localhost:3000`
+- Backend: `http://localhost:8000`
+- PostgreSQL: `localhost:5432`
+
+`docker-compose.yml`은 PostgreSQL, backend, frontend를 함께 올립니다. JWT나 Google OAuth 값을 바꾸려면 실행 전에 환경 변수를 지정하세요.
+
+## Release
+
+릴리스는 `v*` 태그를 기준으로 만듭니다.
+
+```powershell
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+태그를 푸시하면 GitHub Release가 생성되고, backend/frontend Docker 이미지가 GitHub Container Registry에 올라갑니다.
+
 ## 라이선스
 
 이 프로젝트는 MIT 라이선스를 따릅니다. 자세한 내용은 [LICENSE](LICENSE)를 확인하세요.
