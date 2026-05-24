@@ -4,7 +4,7 @@
 
 **A full-stack community platform with a Gundam Universal Century theme**
 
-*A personal toy project built during a university vacation for learning purposes*
+*A personal toy project built during the 2025 summer vacation (June) for learning purposes*
 
 <br />
 
