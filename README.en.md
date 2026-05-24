@@ -13,6 +13,8 @@
 
 ## Overview
 
+A personal toy project built during a university vacation for learning purposes.
+
 GUNDAM UNIVERSE BOARD is a community application covering post creation, comments, authentication, and permission management. The frontend and backend are decoupled; the API and data model are managed alongside their documentation.
 
 ## Features
