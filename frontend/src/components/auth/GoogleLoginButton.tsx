@@ -52,7 +52,7 @@ export function GoogleLoginButton() {
             onSuccess={handleSuccess}
             onError={handleError}
             useOneTap
-            theme="dark"
+            theme="filled_black"
             shape="rectangular"
             text="signin_with"
             locale="ko"
