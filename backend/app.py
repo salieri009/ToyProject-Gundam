@@ -3,7 +3,7 @@ Chalice 앱 엔트리포인트
 - CORS 허용 도메인 화이트리스트 적용
 - 시작 시 필수 환경변수 검증
 """
-from chalice import Chalice
+from chalice import Chalice, Response
 import logging
 
 from chalicelib.database import init_db
@@ -35,8 +35,13 @@ def add_cors_headers(event, get_response):
     """CORS 화이트리스트 동적 반영 미들웨어"""
     # preflight 요청 등에서 Origin 헤더 가져오기
     origin = event.headers.get('origin') or event.headers.get('Origin', '')
+    cors = get_cors_headers(origin)
+    # CORS preflight: 각 라우트에 OPTIONS 를 선언했으므로 미들웨어를 거친다.
+    # 실제 핸들러를 호출하지 않고 여기서 프리플라이트 응답을 직접 반환한다.
+    if event.method == 'OPTIONS':
+        return Response(body='', status_code=200, headers=cors)
     response = get_response(event)
-    response.headers.update(get_cors_headers(origin))
+    response.headers.update(cors)
     return response
 
 

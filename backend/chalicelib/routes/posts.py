@@ -20,11 +20,12 @@ from chalicelib.serializers.post import serialize_post, serialize_post_list
 from chalicelib.serializers.comment import serialize_comment, serialize_comment_with_replies
 from chalicelib.utils.validation import validate_post_data, validate_comment_data
 from chalicelib.utils.pagination import paginate
+from chalicelib.utils.responses import json_response, error_response, no_content
 
 posts_bp = Blueprint(__name__)
 
 
-@posts_bp.route('/posts', methods=['GET'])
+@posts_bp.route('/posts', methods=['GET', 'OPTIONS'])
 def get_posts():
     """게시글 목록 조회"""
     request = posts_bp.current_request
@@ -55,7 +56,7 @@ def get_posts():
         }
 
 
-@posts_bp.route('/posts/{post_id}', methods=['GET'])
+@posts_bp.route('/posts/{post_id}', methods=['GET', 'OPTIONS'])
 def get_post(post_id):
     """게시글 상세 조회"""
     with get_db_session() as session:
@@ -65,7 +66,7 @@ def get_post(post_id):
             .first()
 
         if not post:
-            return {'error': 'Post not found'}, 404
+            return error_response('Post not found', 404)
 
         return serialize_post(post)
 
@@ -77,7 +78,7 @@ def create_post():
     try:
         user = require_auth(request)
     except Exception as e:
-        return {'error': str(e)}, 401
+        return error_response(str(e), 401)
 
     data = request.json_body
     validated = validate_post_data(data)
@@ -103,7 +104,7 @@ def create_post():
             'created_at': post.created_at.isoformat() if post.created_at else None,
         }
 
-    return result, 201
+    return json_response(result, 201)
 
 
 @posts_bp.route('/posts/{post_id}', methods=['PUT'])
@@ -113,7 +114,7 @@ def update_post(post_id):
     try:
         user = require_auth(request)
     except Exception as e:
-        return {'error': str(e)}, 401
+        return error_response(str(e), 401)
 
     data = request.json_body
     validated = validate_post_data(data)
@@ -122,10 +123,10 @@ def update_post(post_id):
         post = session.query(Post).filter(Post.id == post_id).first()
 
         if not post:
-            return {'error': 'Post not found'}, 404
+            return error_response('Post not found', 404)
 
         if str(post.user_id) != str(user.id):
-            return {'error': 'Permission denied'}, 403
+            return error_response('Permission denied', 403)
 
         post.title = validated['title']
         post.content = validated['content']
@@ -147,25 +148,25 @@ def delete_post(post_id):
     try:
         user = require_auth(request)
     except Exception as e:
-        return {'error': str(e)}, 401
+        return error_response(str(e), 401)
 
     with get_db_session() as session:
         post = session.query(Post).filter(Post.id == post_id).first()
 
         if not post:
-            return {'error': 'Post not found'}, 404
+            return error_response('Post not found', 404)
 
         if str(post.user_id) != str(user.id):
-            return {'error': 'Permission denied'}, 403
+            return error_response('Permission denied', 403)
 
         session.delete(post)
 
-    return '', 204
+    return no_content()
 
 
 # ── 댓글 중첩 라우트 (/posts/{id}/comments) ──
 
-@posts_bp.route('/posts/{post_id}/comments', methods=['GET'])
+@posts_bp.route('/posts/{post_id}/comments', methods=['GET', 'OPTIONS'])
 def get_post_comments(post_id):
     """게시글의 댓글 목록 (계층 구조)"""
     with get_db_session() as session:
@@ -196,7 +197,7 @@ def create_post_comment(post_id):
     try:
         user = require_auth(request)
     except Exception as e:
-        return {'error': str(e)}, 401
+        return error_response(str(e), 401)
 
     data = request.json_body
     validated = validate_comment_data(data)
@@ -223,4 +224,4 @@ def create_post_comment(post_id):
             'created_at': comment.created_at.isoformat() if comment.created_at else None,
         }
 
-    return result, 201
+    return json_response(result, 201)

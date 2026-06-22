@@ -6,11 +6,7 @@
       "api_gateway_stage": "api",
       "autogen_policy": true,
       "environment_variables": {
-        "STAGE": "dev",
-        "DATABASE_URL": "",
-        "JWT_SECRET": "",
-        "GOOGLE_CLIENT_ID": "",
-        "GOOGLE_CLIENT_SECRET": ""
+        "STAGE": "dev"
       },
       "lambda_timeout": 30,
       "lambda_memory_size": 512,

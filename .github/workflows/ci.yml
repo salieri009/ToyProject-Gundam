@@ -10,6 +10,28 @@ jobs:
   backend-test:
     name: Backend CI
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: gundam_board
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d gundam_board"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/gundam_board
+      E2E_TEST_MODE: "true"
+      JWT_SECRET: ci-test-secret
+      GOOGLE_CLIENT_ID: ci-test-google-client-id
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -23,7 +45,7 @@ jobs:
         run: |
           cd backend
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
 
       - name: Run Linter
         run: |
@@ -31,6 +53,11 @@ jobs:
           # 만약 flake8이 requirements.txt에 없으면 직접 설치 후 실행
           pip install flake8
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+      - name: Run Tests
+        run: |
+          cd backend
+          pytest
 
   frontend-test:
     name: Frontend CI

@@ -4,6 +4,9 @@ __pycache__
 venv
 .venv
 .env
-.chalice
+# .chalice/config.json 은 `chalice local` 실행에 필요하므로 포함한다.
+# 배포 상태 디렉터리만 제외한다.
+.chalice/deployed/
+.chalice/deployments/
 tests
 .pytest_cache
