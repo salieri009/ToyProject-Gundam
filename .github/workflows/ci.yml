@@ -95,3 +95,67 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: http://localhost:8000
           NEXT_PUBLIC_GOOGLE_CLIENT_ID: dummy-client-id
+
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    needs: [backend-test, frontend-test]
+
+    env:
+      # docker-compose 가 백엔드에 주입하는 값 — 테스트 로그인 시드 활성화
+      E2E_TEST_MODE: "true"
+      JWT_SECRET: ci-e2e-secret
+      GOOGLE_CLIENT_ID: ci-e2e-google-client-id
+      NEXT_PUBLIC_GOOGLE_CLIENT_ID: ci-e2e-google-client-id
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Start full stack (docker compose)
+        run: docker compose up -d --build
+
+      - name: Wait for services to be healthy
+        run: |
+          echo "Waiting for backend /health ..."
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8000/health >/dev/null; then echo "backend up"; break; fi
+            sleep 5
+          done
+          echo "Waiting for frontend :3000 ..."
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000 >/dev/null; then echo "frontend up"; break; fi
+            sleep 5
+          done
+
+      - name: Install E2E dependencies
+        run: |
+          cd e2e
+          npm ci || npm install
+          npx playwright install --with-deps chromium
+
+      - name: Run Playwright tests
+        run: |
+          cd e2e
+          npx playwright test
+
+      - name: Dump docker compose logs on failure
+        if: failure()
+        run: docker compose logs --no-color
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: e2e/playwright-report/
+          retention-days: 7
+
+      - name: Tear down
+        if: always()
+        run: docker compose down -v

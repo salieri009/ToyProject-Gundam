@@ -87,6 +87,7 @@ export default function NewPostPage() {
             <input
               type="text"
               id="title"
+              data-testid="post-title-input"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="ENTER PACKET LOG TITLE..."
@@ -102,6 +103,7 @@ export default function NewPostPage() {
             </label>
             <textarea
               id="content"
+              data-testid="post-content-input"
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="WRITE SIGNAL DATA STREAM..."
@@ -122,6 +124,7 @@ export default function NewPostPage() {
             </button>
             <button
               type="submit"
+              data-testid="post-submit"
               disabled={loading || !title.trim() || !content.trim()}
               className="border border-crt-glow hover:bg-crt-glow/15 px-5 py-2 rounded text-crt-text tracking-wider font-bold transition-all flex items-center space-x-2 disabled:opacity-50 uppercase"
             >

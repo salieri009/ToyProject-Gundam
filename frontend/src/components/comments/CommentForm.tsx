@@ -38,6 +38,7 @@ export function CommentForm({ postId, parentId, onSuccess, onCancel }: CommentFo
     <form onSubmit={handleSubmit} className="w-full space-y-3 font-mono">
       <div className="relative">
         <textarea
+          data-testid={parentId ? 'reply-input' : 'comment-input'}
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder={parentId ? 'ENTER REPLY DATA...' : 'ENTER COMMENT DATA...'}
@@ -67,6 +68,7 @@ export function CommentForm({ postId, parentId, onSuccess, onCancel }: CommentFo
         )}
         <button
           type="submit"
+          data-testid={parentId ? 'reply-submit' : 'comment-submit'}
           disabled={loading || !content.trim()}
           className="px-4 py-1.5 border border-crt-glow hover:bg-crt-glow/10 text-crt-text rounded text-xs transition-all disabled:opacity-50 uppercase"
         >

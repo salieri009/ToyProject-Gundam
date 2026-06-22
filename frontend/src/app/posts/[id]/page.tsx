@@ -127,7 +127,7 @@ export default function PostDetailPage({ params }: { params: { id: string } }) {
                 <span className="text-[10px] text-crt-text/50 uppercase tracking-widest block mb-1">
                   SYS.LOG // LOG-ENTRY
                 </span>
-                <h2 className="text-2xl font-bold text-crt-text tracking-wide mb-3">
+                <h2 data-testid="post-detail-title" className="text-2xl font-bold text-crt-text tracking-wide mb-3">
                   {post.title}
                 </h2>
                 
