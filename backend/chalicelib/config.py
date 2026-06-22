@@ -25,6 +25,10 @@ class Config:
     GOOGLE_CLIENT_ID: str = os.getenv('GOOGLE_CLIENT_ID', '')
     GOOGLE_CLIENT_SECRET: str = os.getenv('GOOGLE_CLIENT_SECRET', '')
 
+    # E2E 테스트 모드 — True일 때만 테스트 전용 로그인 시드(/auth/test-login)가 열린다.
+    # 프로덕션에서는 절대 활성화하지 말 것 (인증 우회 표면).
+    E2E_TEST_MODE: bool = os.getenv('E2E_TEST_MODE', '').strip().lower() in ('1', 'true', 'yes', 'on')
+
     # CORS 허용 도메인 (쉼표 구분)
     CORS_ALLOWED_ORIGINS: str = os.getenv(
         'CORS_ALLOWED_ORIGINS',
@@ -68,9 +72,15 @@ def validate_config():
         errors.append('JWT_SECRET 환경변수가 설정되지 않았습니다.')
     if not config.GOOGLE_CLIENT_ID:
         errors.append('GOOGLE_CLIENT_ID 환경변수가 설정되지 않았습니다.')
+    import logging
+    logger = logging.getLogger(__name__)
     if errors:
-        import logging
-        logger = logging.getLogger(__name__)
         for e in errors:
             logger.warning(f'[CONFIG WARNING] {e}')
+    # 운영 환경 오설정 조기 탐지: 테스트 로그인 시드가 열려 있으면 경고
+    if config.E2E_TEST_MODE:
+        logger.warning(
+            '[SECURITY WARNING] E2E_TEST_MODE 가 활성화되어 /auth/test-login 시드가 열려 있습니다. '
+            '프로덕션에서는 절대 활성화하지 마십시오.'
+        )
     return len(errors) == 0

@@ -1,4 +1,6 @@
-FROM python:3.13-slim
+# Python 3.11 고정 — pinned pydantic 2.5.2 / psycopg2 등은 3.13 휠/빌드 비호환.
+# CI(backend-test)도 3.11 을 사용하므로 동일 런타임으로 정렬한다.
+FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
