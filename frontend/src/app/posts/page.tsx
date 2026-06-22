@@ -93,6 +93,7 @@ export default function PostsPage() {
           </div>
           <button
             onClick={() => router.push('/posts/new')}
+            data-testid="write-message"
             className="border border-crt-glow hover:bg-crt-glow/10 px-4 py-2 rounded text-crt-text transition-all tracking-wider font-bold flex items-center space-x-1.5"
           >
             <Plus className="w-4 h-4" />
@@ -121,6 +122,7 @@ export default function PostsPage() {
                 <article
                   key={post.id}
                   onClick={() => router.push(`/posts/${post.id}`)}
+                  data-testid="post-card"
                   className="border border-crt-glow/20 bg-black/25 p-5 rounded hover:border-crt-glow/70 hover:bg-crt-glow/5 transition-all cursor-pointer relative group"
                 >
                   {/* Neon blue line highlight on hover */}
