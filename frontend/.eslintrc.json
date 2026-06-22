@@ -1,0 +1,12 @@
+{
+  "extends": "next/core-web-vitals",
+  "ignorePatterns": [
+    "node_modules/",
+    ".next/",
+    "eslint.config.js",
+    "vitest.config.ts",
+    "src/test/**",
+    "**/*.test.ts",
+    "**/*.test.tsx"
+  ]
+}
